@@ -4,7 +4,7 @@
 #include <win.h>
 #include <zip++.h>
 
-#include "libuvpp.hpp"
+#include <libuvpp.hpp>
 using namespace libuvpp;
 #include "export.h"
 #include "libuv.h"
