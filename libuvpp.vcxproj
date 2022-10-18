@@ -19,9 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="client.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="export.cpp" />
     <ClCompile Include="libuv.cpp" />
+    <ClCompile Include="server.cpp" />
+    <ClCompile Include="session.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -30,8 +33,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="client.h" />
     <ClInclude Include="export.h" />
     <ClInclude Include="libuv.h" />
+    <ClInclude Include="server.h" />
+    <ClInclude Include="session.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -125,7 +131,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -153,7 +159,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -182,7 +188,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <Optimization>Full</Optimization>
@@ -217,7 +223,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\include\;$(SolutionDir)..\..\3rdparty\;$(SolutionDir)..\..\projects\$(projectname)\;$(SolutionDir)..\..\3rdparty\libuv-1.44.2\include\;$(SolutionDir)..\..\3rdparty\uv-cpp\uv\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4091;4996;</DisableSpecificWarnings>
       <Optimization>MaxSpeed</Optimization>

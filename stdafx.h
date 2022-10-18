@@ -2,11 +2,16 @@
 #define INC_H___6CDDAE11_F6FE_44AD_A8A4_451272E21572__HEAD__
 
 #include <win.h>
+#include <command.h>
 #include <zip++.h>
 
 #include <libuvpp.hpp>
 using namespace libuvpp;
+#include <uvpp.hpp>
 #include "export.h"
+#include "session.h"
+#include "client.h"
+#include "server.h"
 #include "libuv.h"
 
 /// /*新生®（上海）**/
