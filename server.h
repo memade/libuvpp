@@ -2,7 +2,7 @@
 #define INC_H___20F97F29_22A2_4375_9F7B_44AB07EE54EB__HEAD__
 
 namespace local {
- class Server final : public IServer , public uv::TcpServer{
+ class Server final : public IServer {
   std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
  public:
   Server();
@@ -29,6 +29,7 @@ namespace local {
   tfOnServerMessage m_MessageCb = nullptr;
   std::atomic_bool m_IsOpen = false;
   std::vector<std::thread> m_Threads;
+  std::thread m_ServerThread;
   void Process();
   std::string m_Addr;
   EnIPV m_Ipv = EnIPV::IPV4;
@@ -37,6 +38,9 @@ namespace local {
   tfOnSessionCreateAfterCb m_OnSessionCreateAfterCb = nullptr;
   tfOnSessionDestoryAfterCb m_OnSessionDestoryAfterCb = nullptr;
   tfOnSessionDestoryBeforeCb m_OnSessionDestoryBeforeCb = nullptr;
+ private:
+  uv::TcpServer* m_pUVServer = nullptr;
+  uv::EventLoop* m_loop_ = nullptr;
  };
 
 }///namespace local

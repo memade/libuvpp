@@ -2,7 +2,7 @@
 
 namespace local {
 
- Server::Server() : uv::TcpServer(new uv::EventLoop()) {
+ Server::Server() {
   Init();
  }
 
@@ -10,43 +10,45 @@ namespace local {
   UnInit();
  }
  void Server::Init() {
-
-  onMessageCallback_ =
-   [this](uv::TcpConnectionPtr tcp_connection, const char* buffer, ssize_t buffer_size) {
+  m_loop_ = new uv::EventLoop();
+  m_pUVServer = new uv::TcpServer(m_loop_);
+  m_pUVServer->setMessageCallback([this](uv::TcpConnectionPtr tcp_connection, const char* buffer, ssize_t buffer_size) {
    m_SessionQ.search(tcp_connection->Name(),
     [&](Session* pSession) {
      pSession->Read(buffer, buffer_size);
     });
-  };
-
-  onNewConnectCallback_ =
+   });
+  m_pUVServer->setNewConnectCallback(
    [this](std::weak_ptr<uv::TcpConnection> tcp_connection) {
-   auto tcp_conn_ptr = tcp_connection.lock();
-   auto pSession = new Session(
-    shared::Win::Time::TimeStamp<std::chrono::microseconds>(),
-    tcp_conn_ptr->Name(), tcp_conn_ptr.get());
-   m_SessionQ.pop(pSession->Name(), [](const auto&, auto&) {});
-   m_SessionQ.push(pSession->Name(), pSession);
-   if (m_OnSessionCreateAfterCb)
-    m_OnSessionCreateAfterCb(dynamic_cast<ISession*>(pSession));
-   else
-    pSession->Write(NET_COMMAND_TCP_100201, "Welcome to server.");
-  };
+    auto tcp_conn_ptr = tcp_connection.lock();
+    auto pSession = new Session(
+     shared::Win::Time::TimeStamp<std::chrono::microseconds>(),
+     tcp_conn_ptr->Name(), tcp_conn_ptr.get());
+    m_SessionQ.pop(pSession->Name(), [](const auto&, auto&) {});
+    m_SessionQ.push(pSession->Name(), pSession);
+    if (m_OnSessionCreateAfterCb)
+     m_OnSessionCreateAfterCb(dynamic_cast<ISession*>(pSession));
+    else
+     pSession->Write(NET_COMMAND_TCP_100201, "Welcome to server.");
+   });
 
-  onConnectCloseCallback_ =
+  m_pUVServer->setConnectCloseCallback(
    [this](std::weak_ptr<uv::TcpConnection> tcp_connection) {
-   m_SessionQ.pop(tcp_connection.lock().get()->Name(),
-    [&](const auto&, auto& pSession) {
-     if (m_OnSessionDestoryBeforeCb)
-      m_OnSessionDestoryBeforeCb(pSession);
-     pSession->Release();
-     if(m_OnSessionDestoryAfterCb)
-      m_OnSessionDestoryAfterCb(pSession);
-    });
-  };
+    m_SessionQ.pop(tcp_connection.lock().get()->Name(),
+     [&](const auto&, auto& pSession) {
+      if (m_OnSessionDestoryBeforeCb)
+       m_OnSessionDestoryBeforeCb(pSession);
+      pSession->Release();
+      if (m_OnSessionDestoryAfterCb)
+       m_OnSessionDestoryAfterCb(pSession);
+     });
+
+   });
+
  }
  void Server::UnInit() {
-  SK_DELETE_PTR(loop_);
+  SK_DELETE_PTR(m_pUVServer);
+  SK_DELETE_PTR(m_loop_);
  }
  void Server::Release() const {
   delete this;
@@ -71,22 +73,22 @@ namespace local {
    m_Ipv = ipv;
    m_Addr = addr;
 
-   m_Threads.emplace_back(
-    [this]() {
+   m_IsOpen.store(true);
+
+   m_ServerThread = std::thread(
+    [&]() {
      do {
       std::uint16_t port_ = 0;
       std::string ip_;
       if (!Libuv::ParseIPAddr(m_Addr, ip_, port_))
        break;
       uv::SocketAddr socket_addr(ip_, port_, uv::SocketAddr::IPV(m_Ipv));
-      if (0 != bindAndListen(socket_addr))
+      if (0 != m_pUVServer->bindAndListen(socket_addr))
        break;
-      loop_->run();
-      loop_->runInThisLoop([]() {});
+      m_loop_->run();
      } while (0);
     });
 
-   m_IsOpen.store(true);
    m_Threads.emplace_back([this]() {Process(); });
   } while (0);
   return m_IsOpen.load();
@@ -95,17 +97,20 @@ namespace local {
   do {
    if (!m_IsOpen.load())
     break;
-   __super::close(
-    [this]() {
-     std::thread(
-      [&]() {
-       loop_->runInThisLoop([&]() {loop_->stop(); });
-      }).join();
-    });
    m_IsOpen.store(false);
    for (auto& it : m_Threads)
     it.join();
    m_Threads.clear();
+
+   m_pUVServer->close([this]() {
+    m_loop_->runInThisLoop(
+     [&]() {
+      m_loop_->stop();
+     });
+    });
+
+   m_ServerThread.join();
+
   } while (0);
  }
  bool Server::Ready() const {

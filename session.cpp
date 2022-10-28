@@ -22,11 +22,11 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_Name;
  }
- void Session::BindTaskId(const unsigned long& taskid) {
+ void Session::BindTaskId(const unsigned long long& taskid) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_TaskId = taskid;
  }
- const unsigned long& Session::BindTaskId() const {
+ const unsigned long long& Session::BindTaskId() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_TaskId;
  }

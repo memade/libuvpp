@@ -23,8 +23,8 @@ namespace local {
   void* BindPtr() const override final;
   void BindProcessId(const unsigned long&) override final;
   const unsigned long& BindProcessId() const override final;
-   void BindTaskId(const unsigned long&) override final;
-   const unsigned long& BindTaskId() const override final;
+   void BindTaskId(const unsigned long long&) override final;
+   const unsigned long long& BindTaskId() const override final;
  public:
   void Write();
   void Release() const override final;
@@ -40,7 +40,7 @@ namespace local {
   unsigned long long m_BindULL = 0;
   unsigned long m_BindUL = 0;
   unsigned long m_ProcessId = 0;
-  unsigned long m_TaskId = 0;
+  unsigned long long m_TaskId = 0;
  };
 
 }///namespace local
