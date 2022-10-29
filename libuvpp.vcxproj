@@ -46,7 +46,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{29C05D0D-CA50-4357-8592-D5DA2DEAD14E}</ProjectGuid>
+    <ProjectGuid>{CDFE0833-A7BC-4739-AF61-02A8E541505B}</ProjectGuid>
     <RootNamespace>sharedcompile</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

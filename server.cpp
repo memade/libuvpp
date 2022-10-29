@@ -150,7 +150,6 @@ namespace local {
      if (!send_all_session.empty())
       pSession->Write(NET_COMMAND_TCP_100200, send_all_session);
      pSession->Write();
-
      std::vector<std::string> session_read_s;
      pSession->Read(session_read_s);
      for (const auto& data : session_read_s)
