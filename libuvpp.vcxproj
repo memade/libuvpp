@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="config.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="export.cpp" />
     <ClCompile Include="libuv.cpp" />
@@ -34,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="export.h" />
     <ClInclude Include="libuv.h" />
     <ClInclude Include="server.h" />

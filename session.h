@@ -13,6 +13,9 @@ namespace local {
   void Write(const unsigned long long&, const std::string&) override final;
   void Read(std::vector<std::string>&) override final;
   bool Ready() const override final;
+  void Read(std::string&) override final;
+  void Read(const tfSessionReadCb&) override final;
+  void Write(const std::string&) override final;
   void BindUL(const unsigned long&) override final;
   const unsigned long& BindUL() const override final;
   void BindULL(const unsigned long long&) override final;
@@ -23,8 +26,8 @@ namespace local {
   void* BindPtr() const override final;
   void BindProcessId(const unsigned long&) override final;
   const unsigned long& BindProcessId() const override final;
-   void BindTaskId(const unsigned long long&) override final;
-   const unsigned long long& BindTaskId() const override final;
+  void BindTaskId(const unsigned long long&) override final;
+  const unsigned long long& BindTaskId() const override final;
  public:
   void Write();
   void Release() const override final;

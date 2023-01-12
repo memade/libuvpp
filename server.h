@@ -2,6 +2,7 @@
 #define INC_H___20F97F29_22A2_4375_9F7B_44AB07EE54EB__HEAD__
 
 namespace local {
+
  class Server final : public IServer {
   std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
  public:
@@ -11,36 +12,33 @@ namespace local {
   void Init();
   void UnInit();
  protected:
-  const std::string& Addr() const override final;
-  const EnIPV& Ipv() const override final;
-  const EnSocketType& SocketType() const override final;
-  bool Start(const EnSocketType&, const EnIPV&, const std::string&) override final;
+  IConfig* ConfigGet() const override final;
+  bool Start() override final;
   bool Ready() const override final;
-  void MessageCb(const tfOnServerMessage&) override final;
   void Write(const unsigned long long& , const std::string&) override final;
-  void SessionCreateAfterCb(const tfOnSessionCreateAfterCb&) override final;
-  void SessionDestoryAfterCb(const tfOnSessionDestoryAfterCb&) override final;
-  void SessionDestoryBeforeCb(const tfOnSessionDestoryBeforeCb&) override final;
+  void OnServerMessage(const tfOnServerMessage&) override final;
+  void OnSessionCreateAfterCb(const tfOnSessionCreateAfterCb&) override final;
+  void OnSessionDestoryAfterCb(const tfOnSessionDestoryAfterCb&) override final;
+  void OnSessionDestoryBeforeCb(const tfOnSessionDestoryBeforeCb&) override final;
  public:
   void Stop() override final;
   void Release() const override final;
  private:
+  Config* m_pConfig = nullptr;
   shared::container::buffer m_BufferWrite;
-  tfOnServerMessage m_MessageCb = nullptr;
   std::atomic_bool m_IsOpen = false;
   std::vector<std::thread> m_Threads;
   std::thread m_ServerThread;
   void Process();
-  std::string m_Addr;
-  EnIPV m_Ipv = EnIPV::IPV4;
-  EnSocketType m_SocketType = EnSocketType::TCP;
   shared::container::map<std::string, Session*> m_SessionQ;
-  tfOnSessionCreateAfterCb m_OnSessionCreateAfterCb = nullptr;
-  tfOnSessionDestoryAfterCb m_OnSessionDestoryAfterCb = nullptr;
-  tfOnSessionDestoryBeforeCb m_OnSessionDestoryBeforeCb = nullptr;
  private:
   uv::TcpServer* m_pUVServer = nullptr;
   uv::EventLoop* m_loop_ = nullptr;
+ protected:
+  tfOnServerMessage m_OnServerMessage = nullptr;
+  tfOnSessionCreateAfterCb m_OnSessionCreateAfterCb = nullptr;
+  tfOnSessionDestoryAfterCb m_OnSessionDestoryAfterCb = nullptr;
+  tfOnSessionDestoryBeforeCb m_OnSessionDestoryBeforeCb = nullptr;
  };
 
 }///namespace local

@@ -48,14 +48,6 @@ namespace local {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_ToAddr;
  }
- void Client::StatusCb(const tfOnClientStatus& status_cb) {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_StatusCb = status_cb;
- }
- void Client::MessageCb(const tfOnClientMessage& message_cb) {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_MessageCb = message_cb;
- }
  void Client::Write(const std::string& send_data) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   m_pBufferWrite->push(send_data);
@@ -114,9 +106,9 @@ namespace local {
     if (size_unpak <= 0)
      break;
     m_pBufferRead->pop(size_unpak);
-    if (m_MessageCb) {
+    if (m_OnClientMessage) {
      for (const auto& node : nodes) {
-      m_MessageCb(node,
+      m_OnClientMessage(node,
        [&](const char* send_data, const size_t& data_size) {
         if (send_data && data_size > 0)
          m_pBufferWrite->push(send_data, data_size);
@@ -178,8 +170,8 @@ namespace local {
       m_Status.store(EnClientStatus::ConnectTimeout);
      }break;
      }
-     if (m_StatusCb)
-      m_StatusCb(m_Status.load());
+     if (m_OnClientStatus)
+      m_OnClientStatus(m_Status.load());
     });
    client_->setMessageCallback(
     [&](const char* data, ssize_t size) {
@@ -260,5 +252,18 @@ namespace local {
    }
    std::cout << std::format("Preparing to reconnect to the server({}).", m_ToAddr) << std::endl;
   } while (1);
+ }
+
+ void Client::OnClientMessageGetSendData(const tfOnClientMessageGetSendData& cb) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_OnClientMessageGetSendData = cb;
+ }
+ void Client::OnClientMessage(const tfOnClientMessage& cb) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_OnClientMessage = cb;
+ }
+ void Client::OnClientStatus(const tfOnClientStatus& cb) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_OnClientStatus = cb;
  }
 }///namespace local

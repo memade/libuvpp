@@ -10,6 +10,7 @@ namespace local {
  protected:
   IServer* CreateServer() override final;
   IClient* CreateClient() override final;
+  void Release() const override final;
  private:
   Server* m_pServer = nullptr;
   shared::container::map<TypeIdentify, Client*> m_ClientQ;

@@ -100,11 +100,24 @@ namespace local {
   } while (0);
   return result;
  }
+ void Session::Write(const std::string& input) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  m_BufferWrite.push(input);
+ }
  void Session::Write(const unsigned long long& cmd, const std::string& data) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   std::string send_data;
   shared::Win::Packet::Made(cmd, data, send_data);
   m_BufferWrite.push(send_data);
+ }
+ void Session::Read(const tfSessionReadCb& read_cb) {
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  read_cb(m_BufferRead.pop());
+ }
+ void Session::Read(std::string& output) {
+  output.clear();
+  std::lock_guard<std::mutex> lock{ *m_Mutex };
+  output = m_BufferRead.pop();
  }
  void Session::Read(std::vector<std::string>& out_data_s) {
   out_data_s.clear();

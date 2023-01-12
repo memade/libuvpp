@@ -23,10 +23,11 @@ namespace local {
   EnClientStatus Status() const override final;
   void Reconnection(const time_t&) override final;
   void ReconnectionCount(const std::uint16_t&) override final;
-  void MessageCb(const tfOnClientMessage&) override final;
-  void StatusCb(const tfOnClientStatus&) override final;
   void Write(const unsigned long long& , const std::string&) override final;
   void Write(const std::string&) override final;
+  void OnClientMessageGetSendData(const tfOnClientMessageGetSendData&) override final;
+  void OnClientMessage(const tfOnClientMessage&) override final;
+  void OnClientStatus(const tfOnClientStatus&) override final;
  public:
   void Stop() override final;
   void Release() const override final;
@@ -42,8 +43,6 @@ namespace local {
   EnIPV m_Ipv = EnIPV::IPV4;
   EnSocketType m_SocketType = EnSocketType::TCP;
   std::string m_ToAddr;
-  tfOnClientStatus m_StatusCb = nullptr;
-  tfOnClientMessage m_MessageCb = nullptr;
   shared::container::buffer* m_pBufferRead = nullptr;
   shared::container::buffer* m_pBufferWrite = nullptr;
   std::vector<std::thread> m_Threads;
@@ -52,6 +51,10 @@ namespace local {
   uv::TcpClientPtr client_ = nullptr;
   void Process();
   void Reconnection();
+ protected:
+  tfOnClientMessageGetSendData m_OnClientMessageGetSendData = nullptr;
+  tfOnClientMessage m_OnClientMessage = nullptr;
+  tfOnClientStatus m_OnClientStatus = nullptr;
  };
 
 }///namespace local

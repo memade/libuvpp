@@ -8,6 +8,7 @@
 #include <libuvpp.hpp>
 using namespace libuvpp;
 #include <uvpp.hpp>
+#include "config.h"
 #include "export.h"
 #include "session.h"
 #include "client.h"

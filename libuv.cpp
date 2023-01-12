@@ -1,25 +1,24 @@
 ﻿#include "stdafx.h"
 
 namespace local {
- extern Libuv* __gpLibuv = nullptr;
-
  Libuv::Libuv() {
 
  }
-
  Libuv::~Libuv() {
   m_ClientQ.iterate_clear(
-   [](const auto&,Client* pClient,auto&,auto& itclear) {
+   [](const auto&, Client* pClient, auto&, auto& itclear) {
     pClient->Stop();
-    pClient->Release();
-    itclear = true;
+  pClient->Release();
+  itclear = true;
    });
   if (m_pServer) {
    m_pServer->Stop();
    m_pServer->Release();
   }
  }
-
+ void Libuv::Release() const {
+  delete this;
+ }
  IServer* Libuv::CreateServer() {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   if (!m_pServer)
@@ -59,4 +58,7 @@ namespace local {
   }
   return result;
  }
+
+
+ extern Libuv* __gpLibuv = nullptr;
 }///namespace local
