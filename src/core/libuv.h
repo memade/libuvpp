@@ -10,8 +10,13 @@ namespace local {
  protected:
   IServer* CreateServer() override final;
   IClient* CreateClient() override final;
+  IServerHttp* CreateServerHttp() override final;
+  IClientHttp* CreateClientHttp() override final;
+  IProxyTcp* CreateProxyTcp() override final;
   void Release() const override final;
  private:
+  ServerHttp* m_pServerHttp = nullptr;
+  ProxyTcp* m_pProxyTcp = nullptr;
   Server* m_pServer = nullptr;
   shared::container::map<TypeIdentify, Client*> m_ClientQ;
  public:

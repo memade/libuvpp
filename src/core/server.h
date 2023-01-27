@@ -35,6 +35,8 @@ namespace local {
   uv::TcpServer* m_pUVServer = nullptr;
   uv::EventLoop* m_loop_ = nullptr;
  protected:
+  tfOnConnectCb m_OnConnectCb = nullptr;
+  tfOnDisconnectCb m_OnDisconnectCb = nullptr;
   tfOnServerMessage m_OnServerMessage = nullptr;
   tfOnSessionCreateAfterCb m_OnSessionCreateAfterCb = nullptr;
   tfOnSessionDestoryAfterCb m_OnSessionDestoryAfterCb = nullptr;

@@ -2,32 +2,32 @@
 
 namespace local {
 
- Server::Server() {
+ ProxyTcp::ProxyTcp() {
   Init();
  }
 
- Server::~Server() {
+ ProxyTcp::~ProxyTcp() {
   UnInit();
  }
- void Server::Init() {
+ void ProxyTcp::Init() {
   m_loop_ = new uv::EventLoop();
   m_pUVServer = new uv::TcpServer(m_loop_);
   m_pConfig = new Config();
 
  }
- void Server::UnInit() {
+ void ProxyTcp::UnInit() {
   SK_DELETE_PTR(m_pUVServer);
   SK_DELETE_PTR(m_loop_);
   SK_DELETE_PTR(m_pConfig);
  }
- void Server::Release() const {
+ void ProxyTcp::Release() const {
   delete this;
  }
- IConfig* Server::ConfigGet() const {
+ IConfig* ProxyTcp::ConfigGet() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_pConfig;
  }
- bool Server::Start() {
+ bool ProxyTcp::Start() {
   do {
    if (m_IsOpen.load())
     break;
@@ -49,21 +49,26 @@ namespace local {
     tcp_conn_ptr->Name(), tcp_conn_ptr.get());
    m_SessionQ.pop(pSession->Name(), [](const auto&, auto&) {});
    m_SessionQ.push(pSession->Name(), pSession);
+
+   if (m_OnConnectCb) {
+    m_OnConnectCb(pSession);
+   }
+#if 0
    if (m_OnSessionCreateAfterCb)
     m_OnSessionCreateAfterCb(dynamic_cast<ISession*>(pSession));
    else
     pSession->Write(NET_COMMAND_TCP_100201, "Welcome to server.");
+#endif
     });
 
    m_pUVServer->setConnectCloseCallback(
     [this](std::weak_ptr<uv::TcpConnection> tcp_connection) {
      m_SessionQ.pop(tcp_connection.lock().get()->Name(),
      [&](const auto&, auto& pSession) {
-       if (m_OnSessionDestoryBeforeCb)
-       m_OnSessionDestoryBeforeCb(pSession);
+       if (m_OnDisconnectCb) {
+        m_OnDisconnectCb(nullptr);
+       }
    pSession->Release();
-   if (m_OnSessionDestoryAfterCb)
-    m_OnSessionDestoryAfterCb(pSession);
       });
 
     });
@@ -86,7 +91,7 @@ namespace local {
   } while (0);
   return m_IsOpen.load();
  }
- void Server::Stop() {
+ void ProxyTcp::Stop() {
   do {
    if (!m_IsOpen.load())
     break;
@@ -106,32 +111,37 @@ namespace local {
 
   } while (0);
  }
- bool Server::Ready() const {
+ bool ProxyTcp::Ready() const {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
   return m_IsOpen.load();
  }
- void Server::Write(const unsigned long long& cmd, const std::string& data) {
+ void ProxyTcp::Write(const std::string& data) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  std::string send_data;
-  shared::Win::Packet::Made(cmd, data, send_data);
-  m_BufferWrite.push(send_data);
+  m_BufferWrite.push(data);
  }
 
- void Server::Process() {
+ void ProxyTcp::Process() {
   do {
    //SendTo all users. ->m_BufferWrite
    std::string send_all_session = m_BufferWrite.pop();
 
    m_SessionQ.iterate(
     [&](const auto&, Session* pSession, auto&) {
+     std::string read_buffer;
+   pSession->Read(read_buffer);
+   if (m_OnMessage)
+    m_OnMessage(pSession, read_buffer);
+     auto sk = 0;
+#if 0
      if (!send_all_session.empty())
      pSession->Write(NET_COMMAND_TCP_100200, send_all_session);
    pSession->Write();
    std::vector<std::string> session_read_s;
    pSession->Read(session_read_s);
    for (const auto& data : session_read_s)
-    if (m_OnServerMessage)
-     m_OnServerMessage(pSession, data);
+    if (m_OnMessage)
+     m_OnMessage(pSession, data);
+#endif
     });
 
    if (!m_IsOpen.load()) {
@@ -145,21 +155,16 @@ namespace local {
    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   } while (1);
  }
-
- void Server::OnServerMessage(const tfOnServerMessage& cb) {
+ void ProxyTcp::OnMessage(const tfOnServerMessage& cb) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_OnServerMessage = cb;
+  m_OnMessage = cb;
  }
- void Server::OnSessionCreateAfterCb(const tfOnSessionCreateAfterCb& cb) {
+ void ProxyTcp::OnConnect(const tfOnConnectCb& cb) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_OnSessionCreateAfterCb = cb;
+  m_OnConnectCb = cb;
  }
- void Server::OnSessionDestoryAfterCb(const tfOnSessionDestoryAfterCb& cb) {
+ void ProxyTcp::OnDisconnect(const tfOnDisconnectCb& cb) {
   std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_OnSessionDestoryAfterCb = cb;
- }
- void Server::OnSessionDestoryBeforeCb(const tfOnSessionDestoryBeforeCb& cb) {
-  std::lock_guard<std::mutex> lock{ *m_Mutex };
-  m_OnSessionDestoryBeforeCb = cb;
+  m_OnDisconnectCb = cb;
  }
 }///namespace local

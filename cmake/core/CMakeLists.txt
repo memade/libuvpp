@@ -13,10 +13,16 @@ ${SOURCES_DIR}config.cpp
 ${SOURCES_DIR}config.h
 ${SOURCES_DIR}client.cpp
 ${SOURCES_DIR}client.h
+${SOURCES_DIR}client_http.cpp
+${SOURCES_DIR}client_http.h
 ${SOURCES_DIR}export.cpp
 ${SOURCES_DIR}export.h
 ${SOURCES_DIR}server.cpp
 ${SOURCES_DIR}server.h
+${SOURCES_DIR}server_http.cpp
+${SOURCES_DIR}server_http.h
+${SOURCES_DIR}proxy_tcp.cpp
+${SOURCES_DIR}proxy_tcp.h
 ${SOURCES_DIR}session.cpp
 ${SOURCES_DIR}session.h
 )

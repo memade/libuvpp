@@ -48,6 +48,8 @@ namespace libuvpp {
  using tfOnSessionCreateAfterCb = std::function<void(class ISession*)>;
  using tfOnSessionDestoryAfterCb = std::function<void(class ISession*)>;
  using tfOnSessionDestoryBeforeCb = std::function<void(class ISession*)>;
+ using tfOnConnectCb = std::function<void(class ISession*)>;
+ using tfOnDisconnectCb = std::function<void(class ISession*)>;
  //!@ To session.
  using tfSessionReadCb = std::function<void(const std::string&)>;
 
@@ -126,10 +128,39 @@ namespace libuvpp {
   virtual void OnSessionDestoryBeforeCb(const tfOnSessionDestoryBeforeCb&) = 0;
  };
 
+ class IProxyTcp {
+ public:
+  virtual IConfig* ConfigGet() const = 0;
+  virtual bool Start() = 0;
+  virtual void Stop() = 0;
+  virtual bool Ready() const = 0;
+  virtual void Release() const = 0;
+  virtual void Write(const std::string&) = 0;
+  virtual void OnMessage(const tfOnServerMessage&) = 0;
+  virtual void OnConnect(const tfOnConnectCb&) = 0;
+  virtual void OnDisconnect(const tfOnDisconnectCb&) = 0;
+ };
+
+
+ class IServerHttp {
+ public:
+  virtual void Release() const = 0;
+  virtual bool Start() = 0;
+  virtual void Stop() = 0;
+ };
+
+ class IClientHttp {
+ public:
+  virtual void Release() const = 0;
+ };
+
  class ILibuv : public shared::InterfaceDll<ILibuv> {
  public:
   virtual IClient* CreateClient() = 0;
   virtual IServer* CreateServer() = 0;
+  virtual IProxyTcp* CreateProxyTcp() = 0;
+  virtual IClientHttp* CreateClientHttp() = 0;
+  virtual IServerHttp* CreateServerHttp() = 0;
   virtual void Release() const = 0;
  protected:
   ILibuv() {}
