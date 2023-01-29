@@ -41,6 +41,7 @@ ${SOLUTION_ROOT_DIR}/include
 ${SOLUTION_ROOT_DIR}/3rdparty/spdlog/include
 ${SOLUTION_ROOT_DIR}/3rdparty/uv-cpp/uv/include
 ${SOLUTION_ROOT_DIR}/3rdparty/libuv-1.44.2/include
+${SOLUTION_ROOT_DIR}/3rdparty/http-parser
 )
 
 # 依赖库目录

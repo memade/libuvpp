@@ -32,6 +32,12 @@ namespace local {
    if (m_IsOpen.load())
     break;
 
+#if 0//TEST HTTP CLIENT
+   uv::EventLoop loop;
+   auto pClientHttp = new ClientHttp(shared::Win::Time::TimeStamp<std::chrono::microseconds>(), &loop);
+   pClientHttp->Start(R"(https://cn.bing.com/)", EnClientHttpConnectType::TYPE_DOMAIN);
+#endif
+
    m_IsOpen.store(true);
 
    m_pUVServer->setMessageCallback([this](uv::TcpConnectionPtr tcp_connection, const char* buffer, ssize_t buffer_size) {
@@ -68,7 +74,7 @@ namespace local {
        if (m_OnDisconnectCb) {
         m_OnDisconnectCb(nullptr);
        }
-   pSession->Release();
+       pSession->Release();
       });
 
     });
@@ -129,8 +135,30 @@ namespace local {
     [&](const auto&, Session* pSession, auto&) {
      std::string read_buffer;
    pSession->Read(read_buffer);
-   if (m_OnMessage)
+   if (m_OnMessage) {
     m_OnMessage(pSession, read_buffer);
+
+    do {
+     if (read_buffer.empty())
+      break;
+     size_t parsed_size = 0;
+     httpparser::HttpRequest parsed_map;
+     if (!httpparser::Method::parse_http_request(read_buffer, parsed_size, parsed_map))
+      break;
+
+     uv::EventLoop loop;
+     auto pClientHttp = new ClientHttp(shared::Win::Time::TimeStamp<std::chrono::microseconds>(), &loop);
+     pClientHttp->Start(parsed_map[std::string("host")], EnClientHttpConnectType::TYPE_DOMAIN);
+
+
+
+     auto sk = 0;
+    } while (0);
+
+
+
+   }
+
      auto sk = 0;
 #if 0
      if (!send_all_session.empty())

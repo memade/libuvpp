@@ -31,6 +31,10 @@ namespace libuvpp {
   PIPE = 3,
  };
 
+ enum class EnClientHttpConnectType {
+  TYPE_IP = 0,
+  TYPE_DOMAIN = 1,
+ };
  enum class EnClientStatus {
   ConnectSuccess = 0,
   ConnectFail = 1,
@@ -151,7 +155,11 @@ namespace libuvpp {
 
  class IClientHttp {
  public:
+  virtual const TypeIdentify& Identify() const = 0;
+  virtual void RoutePacket(const std::string&) = 0;
   virtual void Release() const = 0;
+  virtual bool Start(const std::string&,const EnClientHttpConnectType&) = 0;
+  virtual void Stop() = 0;
  };
 
  class ILibuv : public shared::InterfaceDll<ILibuv> {

@@ -6,10 +6,20 @@ namespace local {
  class ClientHttp final : public IClientHttp {
   std::shared_ptr<std::mutex> m_Mutex = std::make_shared<std::mutex>();
  public:
-  ClientHttp();
+  ClientHttp(const TypeIdentify&, uv::EventLoop* evloop=nullptr);
   virtual ~ClientHttp();
  public:
+   bool Start(const std::string&, const EnClientHttpConnectType&) override final;
+   void Stop() override final;
+  const TypeIdentify& Identify() const override final;
   void Release() const override final;
+  void RoutePacket(const std::string&) override final;
+ private:
+  void OnDNSGetIPAddrCb(uv::EventLoop*,int, std::string&);
+ private:
+  const TypeIdentify m_Identify;
+  std::atomic_bool m_IsOpen = false;
+  std::string m_RoutePacket;
  };
 
 }///namespace local

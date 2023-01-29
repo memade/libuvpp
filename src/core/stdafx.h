@@ -1,6 +1,7 @@
 ﻿#if !defined(INC_H___6CDDAE11_F6FE_44AD_A8A4_451272E21572__HEAD__)
 #define INC_H___6CDDAE11_F6FE_44AD_A8A4_451272E21572__HEAD__
 
+#include <http_parser.hpp>
 #include <win.h>
 #include <command.h>
 #include <zip++.h>
